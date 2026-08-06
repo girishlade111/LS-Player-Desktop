@@ -69,7 +69,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
   const defaultAdapter = new Html5VideoAdapter();
 
   defaultAdapter.subscribe((state) => {
-    get().updatePlaybackState(state);
+    set({ playbackState: state });
   });
 
   return {
