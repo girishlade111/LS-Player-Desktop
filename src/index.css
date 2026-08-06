@@ -1,145 +1,56 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 224.3 76.3% 48%;
-  --radius: 0.5rem;
+  /* Classic Win32 / VLC colors */
+  --background: 0 0% 94.1%; /* #F0F0F0 classic windows background */
+  --foreground: 0 0% 0%;
   
-  --ls-bg: 224 45% 6%; /* graphite near-black */
-  --ls-surface: 224 45% 10%; /* elevated dark gray */
-  --ls-panel: 224 45% 13%; 
-  --ls-border: 224 45% 18%;
-  --ls-accent: 217 91% 60%; /* electric blue */
-  --ls-cyan: 199 89% 48%; /* cyan */
-}
-
-.light {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
+  --primary: 211 100% 50%; /* Classic selection blue */
+  --primary-foreground: 0 0% 100%;
   
-  --ls-bg: 210 40% 98%; 
-  --ls-surface: 0 0% 100%; 
-  --ls-panel: 210 40% 96%;
-  --ls-border: 214 32% 91%;
-  --ls-accent: 221 83% 53%; 
-  --ls-cyan: 199 89% 48%;
+  --secondary: 0 0% 89.8%; /* #E5E5E5 */
+  --secondary-foreground: 0 0% 0%;
+  
+  --border: 0 0% 63.9%; /* #A3A3A3 */
+  
+  --vlc-menu-bg: 0 0% 100%;
+  --vlc-menu-hover: 211 100% 85%;
+  
+  --vlc-control-bg: 0 0% 94.1%; /* Bottom bar */
+  
+  --radius: 0; /* No rounded corners in classic VLC */
 }
 
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
   
-  --color-ls-bg: hsl(var(--ls-bg));
-  --color-ls-surface: hsl(var(--ls-surface));
-  --color-ls-panel: hsl(var(--ls-panel));
-  --color-ls-border: hsl(var(--ls-border));
-  --color-ls-accent: hsl(var(--ls-accent));
-  --color-ls-cyan: hsl(var(--ls-cyan));
+  --color-vlc-menu-bg: hsl(var(--vlc-menu-bg));
+  --color-vlc-menu-hover: hsl(var(--vlc-menu-hover));
+  --color-vlc-control-bg: hsl(var(--vlc-control-bg));
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: var(--radius);
   
-  --font-sans: "Segoe UI Variable", "Segoe UI", "Inter", system-ui, sans-serif;
-  --font-mono: "Consolas", "Fira Code", monospace;
-
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-pulse-glow: pulse-glow 3s infinite ease-in-out;
-  --animate-shimmer: shimmer 2s infinite;
-
-  @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
-  }
-  @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
-  }
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.05); }
-  }
-  @keyframes shimmer {
-    100% { transform: translateX(100%); }
-  }
+  /* Classic system fonts */
+  --font-sans: "Segoe UI", "Tahoma", "Geneva", "Verdana", sans-serif;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-none;
   }
   body {
-    @apply bg-ls-bg text-foreground font-sans antialiased overflow-hidden;
-  }
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-ls-border rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-background text-foreground font-sans antialiased overflow-hidden select-none;
+    /* Use a standard cursor */
+    cursor: default;
   }
 }

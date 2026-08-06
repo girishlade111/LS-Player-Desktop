@@ -45,7 +45,7 @@ export const VideoViewport: React.FC = () => {
 
   return (
     <div
-      className="relative flex h-full w-full items-center justify-center overflow-hidden bg-black"
+      className={`relative flex h-full w-full items-center justify-center overflow-hidden ${currentMedia ? 'bg-black' : 'bg-transparent'}`}
       onDoubleClick={toggleFullscreen}
     >
       <video
