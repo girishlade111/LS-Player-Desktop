@@ -1,51 +1,30 @@
 import { create } from 'zustand';
-import type { NavigationTab } from '../types';
 
 interface UiStore {
-  activeTab: NavigationTab;
-  isSplashActive: boolean;
-  isSidebarCollapsed: boolean;
-  isCommandPaletteOpen: boolean;
-  isShortcutsModalOpen: boolean;
-  isFileInfoModalOpen: boolean;
-  isDraggingFile: boolean;
+  isPreferencesOpen: boolean;
+  isEffectsFiltersOpen: boolean;
+  isMediaInfoOpen: boolean;
+  isAdvancedControlsOpen: boolean;
+  isPlaylistOpen: boolean;
 
   // Actions
-  setActiveTab: (tab: NavigationTab) => void;
-  setSplashActive: (active: boolean) => void;
-  setSidebarCollapsed: (collapsed: boolean) => void;
-  toggleSidebar: () => void;
-  setCommandPaletteOpen: (open: boolean) => void;
-  toggleCommandPalette: () => void;
-  setShortcutsModalOpen: (open: boolean) => void;
-  setFileInfoModalOpen: (open: boolean) => void;
-  setDraggingFile: (dragging: boolean) => void;
+  setPreferencesOpen: (open: boolean) => void;
+  setEffectsFiltersOpen: (open: boolean) => void;
+  setMediaInfoOpen: (open: boolean) => void;
+  setAdvancedControlsOpen: (open: boolean) => void;
+  setPlaylistOpen: (open: boolean) => void;
 }
 
 export const useUiStore = create<UiStore>((set) => ({
-  activeTab: 'home',
-  isSplashActive: true,
-  isSidebarCollapsed: false,
-  isCommandPaletteOpen: false,
-  isShortcutsModalOpen: false,
-  isFileInfoModalOpen: false,
-  isDraggingFile: false,
+  isPreferencesOpen: false,
+  isEffectsFiltersOpen: false,
+  isMediaInfoOpen: false,
+  isAdvancedControlsOpen: false,
+  isPlaylistOpen: false,
 
-  setActiveTab: (tab) => set({ activeTab: tab }),
-
-  setSplashActive: (active) => set({ isSplashActive: active }),
-
-  setSidebarCollapsed: (collapsed) => set({ isSidebarCollapsed: collapsed }),
-
-  toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
-
-  setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
-
-  toggleCommandPalette: () => set((state) => ({ isCommandPaletteOpen: !state.isCommandPaletteOpen })),
-
-  setShortcutsModalOpen: (open) => set({ isShortcutsModalOpen: open }),
-
-  setFileInfoModalOpen: (open) => set({ isFileInfoModalOpen: open }),
-
-  setDraggingFile: (dragging) => set({ isDraggingFile: dragging }),
+  setPreferencesOpen: (open) => set({ isPreferencesOpen: open }),
+  setEffectsFiltersOpen: (open) => set({ isEffectsFiltersOpen: open }),
+  setMediaInfoOpen: (open) => set({ isMediaInfoOpen: open }),
+  setAdvancedControlsOpen: (open) => set({ isAdvancedControlsOpen: open }),
+  setPlaylistOpen: (open) => set({ isPlaylistOpen: open }),
 }));

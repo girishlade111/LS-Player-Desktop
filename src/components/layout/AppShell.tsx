@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { VlcMenuBar } from './VlcMenuBar';
 import { PlayerView } from '../player/PlayerView';
 import { PlayerControls } from '../player/PlayerControls';
+import { AdvancedControls } from '../player/AdvancedControls';
 import { usePlayerStore } from '../../stores/usePlayerStore';
+
+// Dialogs
+import { EffectsFiltersDialog } from '../vlc-dialogs/EffectsFiltersDialog';
+import { MediaInfoDialog } from '../vlc-dialogs/MediaInfoDialog';
+import { PreferencesDialog } from '../vlc-dialogs/PreferencesDialog';
+import { PlaylistWindow } from '../vlc-dialogs/PlaylistWindow';
 
 export const AppShell: React.FC = () => {
   const { loadMedia } = usePlayerStore();
@@ -46,23 +53,30 @@ export const AppShell: React.FC = () => {
 
   return (
     <div
-      className="flex h-screen w-screen flex-col overflow-hidden bg-vlc-control-bg text-foreground"
+      className="flex h-screen w-screen flex-col overflow-hidden bg-vlc-control-bg text-foreground relative"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       <VlcMenuBar />
       
-      {/* Video Viewport Area (Black background) */}
+      {/* Video Viewport Area */}
       <main className="flex flex-1 flex-col overflow-hidden relative bg-black border-t border-b border-border">
         <PlayerView />
       </main>
 
-      {/* Classic VLC Controls at the bottom */}
+      <AdvancedControls />
       <PlayerControls />
 
+      {/* Global Dialogs */}
+      <EffectsFiltersDialog />
+      <MediaInfoDialog />
+      <PreferencesDialog />
+      <PlaylistWindow />
+
+      {/* Drag & Drop Indicator */}
       {isDragOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 border-4 border-dashed border-primary pointer-events-none">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 border-4 border-dashed border-primary pointer-events-none">
           <span className="text-white text-2xl font-bold bg-black/80 px-4 py-2 rounded">Drop Video to Play</span>
         </div>
       )}

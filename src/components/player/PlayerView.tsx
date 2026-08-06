@@ -21,7 +21,7 @@ export const PlayerView: React.FC = () => {
             </div>
             <div className="absolute top-0 left-12 w-8 h-4 bg-orange-700 rounded-t-lg"></div>
           </div>
-          <p className="mt-8 font-bold tracking-widest text-2xl text-[#fff] opacity-20 select-none">VLC media player</p>
+          <p className="mt-8 font-bold tracking-widest text-2xl text-[#fff] opacity-20 select-none">LS Player</p>
         </div>
       )}
 
