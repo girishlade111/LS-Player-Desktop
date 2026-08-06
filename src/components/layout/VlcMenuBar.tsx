@@ -3,7 +3,7 @@ import { usePlayerStore } from '../../stores/usePlayerStore';
 import { useUiStore } from '../../stores/useUiStore';
 
 export const VlcMenuBar: React.FC = () => {
-  const { loadMedia, stop, togglePlayPause, seekRelative, setFullscreen } = usePlayerStore();
+  const { loadMedia, stop, togglePlayPause, seekRelative, setFullscreen, setSpeed, takeScreenshot, setAspectRatio } = usePlayerStore();
   const { 
     setEffectsFiltersOpen, 
     setMediaInfoOpen, 
@@ -60,6 +60,16 @@ export const VlcMenuBar: React.FC = () => {
     }
   };
 
+  const handleSnapshot = async () => {
+    const dataUrl = await takeScreenshot();
+    if (dataUrl) {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `snapshot_${Date.now()}.png`;
+      a.click();
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -104,7 +114,18 @@ export const VlcMenuBar: React.FC = () => {
         { label: 'Previous', action: () => alert('Stub: Previous') },
         { label: 'Next', action: () => alert('Stub: Next') },
         { divider: true },
-        { label: 'Speed', action: () => alert('Stub: Speed submenu') },
+        { 
+          label: 'Speed (Faster)', 
+          action: () => setSpeed(2.0) 
+        },
+        { 
+          label: 'Speed (Normal)', 
+          action: () => setSpeed(1.0) 
+        },
+        { 
+          label: 'Speed (Slower)', 
+          action: () => setSpeed(0.5) 
+        },
         { label: 'Jump Forward', action: () => seekRelative(10) },
         { label: 'Jump Backward', action: () => seekRelative(-10) }
       ] 
@@ -126,11 +147,14 @@ export const VlcMenuBar: React.FC = () => {
         { divider: true },
         { label: 'Fullscreen', action: () => setFullscreen(true) },
         { label: 'Always Fit Window', action: () => alert('Stub: Fit Window') },
-        { label: 'Aspect Ratio', action: () => alert('Stub: Aspect Ratio') },
+        { label: 'Aspect Ratio (Default)', action: () => setAspectRatio('auto') },
+        { label: 'Aspect Ratio (16:9)', action: () => setAspectRatio('16:9') },
+        { label: 'Aspect Ratio (4:3)', action: () => setAspectRatio('4:3') },
+        { label: 'Aspect Ratio (Fill)', action: () => setAspectRatio('fill') },
         { label: 'Crop', action: () => alert('Stub: Crop') },
         { label: 'Zoom', action: () => alert('Stub: Zoom') },
         { divider: true },
-        { label: 'Take Snapshot', action: () => alert('Stub: Take Snapshot') },
+        { label: 'Take Snapshot', action: handleSnapshot },
       ] 
     },
     { 

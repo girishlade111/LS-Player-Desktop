@@ -1,4 +1,4 @@
-import type { AudioTrack, CodecMetadata, MediaItem, SubtitleTrack, VideoTransform } from '../types';
+import type { AudioTrack, CodecMetadata, EqualizerState, LoopState, MediaItem, SubtitleTrack, VideoTransform } from '../types';
 import type { MediaEngineAdapter, PlaybackEventListener, PlaybackState } from './MediaEngineAdapter';
 
 export class Html5VideoAdapter implements MediaEngineAdapter {
@@ -9,6 +9,12 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
   private canvasEl: HTMLCanvasElement | null = null;
   private listeners: Set<PlaybackEventListener> = new Set();
   private currentItem: MediaItem | null = null;
+
+  // Web Audio API properties
+  private audioCtx: AudioContext | null = null;
+  private sourceNode: MediaElementAudioSourceNode | null = null;
+  private preampNode: GainNode | null = null;
+  private eqBands: BiquadFilterNode[] = [];
 
   private state: PlaybackState = {
     isPlaying: false,
@@ -27,6 +33,16 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
       brightness: 100,
       contrast: 100,
       saturation: 100,
+      hue: 0,
+    },
+    equalizer: {
+      enabled: false,
+      preamp: 0,
+      bands: Array(10).fill(0),
+    },
+    loopState: {
+      a: null,
+      b: null,
     },
     isEnded: false,
   };
@@ -68,6 +84,14 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
   private onTimeUpdate = () => {
     if (!this.videoEl) return;
     this.state.currentTime = this.videoEl.currentTime;
+
+    // Loop A-B logic
+    const { loopState } = this.state;
+    if (loopState.a !== null && loopState.b !== null && this.videoEl.currentTime >= loopState.b) {
+      this.videoEl.currentTime = loopState.a;
+      this.state.currentTime = loopState.a;
+    }
+
     this.notify();
   };
 
@@ -80,6 +104,7 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
   private onPlay = () => {
     this.state.isPlaying = true;
     this.state.isEnded = false;
+    this.setupAudioContext(); // Initialize context on first play to avoid browser autoplay restrictions
     this.notify();
   };
 
@@ -290,6 +315,75 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
     return canvas.toDataURL('image/png');
   }
 
+  // ----- Audio Equalizer (Web Audio API) -----
+  private setupAudioContext(): void {
+    if (this.audioCtx || !this.videoEl) return;
+    try {
+      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.sourceNode = this.audioCtx.createMediaElementSource(this.videoEl);
+      this.preampNode = this.audioCtx.createGain();
+      
+      const freqs = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
+      this.eqBands = freqs.map((freq) => {
+        const filter = this.audioCtx!.createBiquadFilter();
+        filter.type = 'peaking';
+        filter.frequency.value = freq;
+        filter.Q.value = 1.0;
+        filter.gain.value = 0;
+        return filter;
+      });
+
+      // Chain: source -> preamp -> eq[0] -> ... -> eq[9] -> destination
+      this.sourceNode.connect(this.preampNode);
+      let lastNode: AudioNode = this.preampNode;
+      this.eqBands.forEach((band) => {
+        lastNode.connect(band);
+        lastNode = band;
+      });
+      lastNode.connect(this.audioCtx.destination);
+      this.applyEqualizerState();
+    } catch (e) {
+      console.warn("Could not setup AudioContext", e);
+    }
+  }
+
+  setEqualizer(eq: EqualizerState): void {
+    this.state.equalizer = { ...eq };
+    this.applyEqualizerState();
+    this.notify();
+  }
+
+  private applyEqualizerState(): void {
+    if (!this.audioCtx || !this.preampNode) return;
+    const { enabled, preamp, bands } = this.state.equalizer;
+    
+    if (enabled) {
+      // Map preamp (-20 to +20 dB) to gain multiplier (0.1 to 10 approx)
+      this.preampNode.gain.value = Math.pow(10, preamp / 20);
+      this.eqBands.forEach((band, i) => {
+        band.gain.value = bands[i] || 0;
+      });
+    } else {
+      this.preampNode.gain.value = 1;
+      this.eqBands.forEach(band => band.gain.value = 0);
+    }
+  }
+
+  // ----- Loop A-B & Frame step -----
+  setLoop(loop: LoopState): void {
+    this.state.loopState = { ...loop };
+    this.notify();
+  }
+
+  frameStep(): void {
+    if (!this.videoEl) return;
+    this.videoEl.pause();
+    this.state.isPlaying = false;
+    this.videoEl.currentTime += (1 / 30); // Advance roughly 1 frame at 30fps
+    this.state.currentTime = this.videoEl.currentTime;
+    this.notify();
+  }
+
   subscribe(listener: PlaybackEventListener): () => void {
     this.listeners.add(listener);
     listener(this.state);
@@ -308,5 +402,9 @@ export class Html5VideoAdapter implements MediaEngineAdapter {
     this.listeners.clear();
     this.videoEl = null;
     this.canvasEl = null;
+    if (this.audioCtx) {
+      this.audioCtx.close();
+      this.audioCtx = null;
+    }
   }
 }

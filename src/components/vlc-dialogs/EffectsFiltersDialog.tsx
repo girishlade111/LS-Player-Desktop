@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useUiStore } from '../../stores/useUiStore';
+import { usePlayerStore } from '../../stores/usePlayerStore';
 
 export const EffectsFiltersDialog: React.FC = () => {
   const { isEffectsFiltersOpen, setEffectsFiltersOpen } = useUiStore();
+  const { playbackState, toggleEqualizer, setEqualizerPreamp, setEqualizerBand, setVideoEffect } = usePlayerStore();
   const [activeTab, setActiveTab] = useState<'audio' | 'video'>('audio');
   
   if (!isEffectsFiltersOpen) return null;
+
+  const { equalizer, transform } = playbackState;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
@@ -43,7 +47,12 @@ export const EffectsFiltersDialog: React.FC = () => {
           {activeTab === 'audio' && (
             <div>
               <div className="flex items-center gap-2 mb-4 border-b border-gray-200 pb-2">
-                <input type="checkbox" id="enableEq" />
+                <input 
+                  type="checkbox" 
+                  id="enableEq" 
+                  checked={equalizer.enabled} 
+                  onChange={toggleEqualizer} 
+                />
                 <label htmlFor="enableEq" className="font-semibold">Enable</label>
                 <select className="border border-gray-300 ml-4 px-1" defaultValue="Flat">
                   <option>Flat</option>
@@ -58,13 +67,31 @@ export const EffectsFiltersDialog: React.FC = () => {
               <div className="flex justify-between items-end h-40 px-2 mt-8">
                 {/* Preamp */}
                 <div className="flex flex-col items-center gap-2">
-                  <input type="range" orient="vertical" className="appearance-none w-1 h-32 bg-gray-300 outline-none" style={{ writingMode: 'vertical-lr', direction: 'rtl' }} />
+                  <input 
+                    type="range" 
+                    min="-20" max="20" step="0.1"
+                    value={equalizer.preamp}
+                    onChange={(e) => setEqualizerPreamp(parseFloat(e.target.value))}
+                    disabled={!equalizer.enabled}
+                    orient="vertical" 
+                    className="appearance-none w-1 h-32 bg-gray-300 outline-none" 
+                    style={{ writingMode: 'vertical-lr', direction: 'rtl' }} 
+                  />
                   <span className="text-[10px]">Preamp</span>
                 </div>
                 {/* Bands */}
                 {[60, 170, 310, 600, '1K', '3K', '6K', '12K', '14K', '16K'].map((freq, i) => (
                   <div key={i} className="flex flex-col items-center gap-2">
-                    <input type="range" orient="vertical" className="appearance-none w-1 h-32 bg-gray-300 outline-none" style={{ writingMode: 'vertical-lr', direction: 'rtl' }} />
+                    <input 
+                      type="range" 
+                      min="-20" max="20" step="0.1"
+                      value={equalizer.bands[i] || 0}
+                      onChange={(e) => setEqualizerBand(i, parseFloat(e.target.value))}
+                      disabled={!equalizer.enabled}
+                      orient="vertical" 
+                      className="appearance-none w-1 h-32 bg-gray-300 outline-none" 
+                      style={{ writingMode: 'vertical-lr', direction: 'rtl' }} 
+                    />
                     <span className="text-[10px]">{freq}</span>
                   </div>
                 ))}
@@ -87,10 +114,17 @@ export const EffectsFiltersDialog: React.FC = () => {
                   <label htmlFor="imageAdjust" className="font-semibold">Image adjust</label>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pl-6">
-                  {['Hue', 'Brightness', 'Contrast', 'Saturation', 'Gamma'].map(prop => (
+                  {(['hue', 'brightness', 'contrast', 'saturation'] as const).map(prop => (
                     <div key={prop} className="flex justify-between items-center gap-2">
-                      <label className="text-xs">{prop}</label>
-                      <input type="range" className="w-24 h-1 bg-gray-300 outline-none" />
+                      <label className="text-xs capitalize">{prop}</label>
+                      <input 
+                        type="range" 
+                        min={prop === 'hue' ? 0 : 0} 
+                        max={prop === 'hue' ? 360 : 200} 
+                        value={transform[prop]}
+                        onChange={(e) => setVideoEffect(prop, parseFloat(e.target.value))}
+                        className="w-24 h-1 bg-gray-300 outline-none" 
+                      />
                     </div>
                   ))}
                 </div>

@@ -88,6 +88,18 @@ export interface VideoTransform {
   brightness: number; // 100 default
   contrast: number; // 100 default
   saturation: number; // 100 default
+  hue: number; // 0 default
+}
+
+export interface EqualizerState {
+  enabled: boolean;
+  preamp: number;
+  bands: number[]; // 10 bands
+}
+
+export interface LoopState {
+  a: number | null;
+  b: number | null;
 }
 
 export interface SubtitleStyle {

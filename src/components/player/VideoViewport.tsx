@@ -30,7 +30,7 @@ export const VideoViewport: React.FC = () => {
 
     return {
       transform: `${rotation} scale(${scaleX}, ${scaleY})`,
-      filter: `brightness(${transform.brightness}%) contrast(${transform.contrast}%) saturate(${transform.saturation}%)`,
+      filter: `brightness(${transform.brightness}%) contrast(${transform.contrast}%) saturate(${transform.saturation}%) hue-rotate(${transform.hue || 0}deg)`,
       objectFit,
       transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease',
     };

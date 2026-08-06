@@ -31,7 +31,19 @@ interface PlayerStore {
   toggleFlipH: () => void;
   toggleFlipV: () => void;
   setZoom: (zoom: number) => void;
+  setVideoEffect: (effect: 'brightness' | 'contrast' | 'saturation' | 'hue', value: number) => void;
   resetTransforms: () => void;
+  
+  // Equalizer actions
+  toggleEqualizer: () => void;
+  setEqualizerPreamp: (value: number) => void;
+  setEqualizerBand: (index: number, value: number) => void;
+  
+  // Loop A-B & Frame step
+  setLoopA: () => void;
+  setLoopB: () => void;
+  clearLoop: () => void;
+  frameStep: () => void;
 
   // Track selectors
   selectSubtitle: (trackId: string | undefined) => void;
@@ -63,6 +75,7 @@ const DEFAULT_TRANSFORM: VideoTransform = {
   brightness: 100,
   contrast: 100,
   saturation: 100,
+  hue: 0,
 };
 
 export const usePlayerStore = create<PlayerStore>((set, get) => {
@@ -84,6 +97,15 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
       playbackRate: 1.0,
       buffered: 0,
       transform: DEFAULT_TRANSFORM,
+      equalizer: {
+        enabled: false,
+        preamp: 0,
+        bands: Array(10).fill(0),
+      },
+      loopState: {
+        a: null,
+        b: null,
+      },
       isEnded: false,
     },
     osdMessage: null,
@@ -201,9 +223,57 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
       get().showOsd(`Zoom: ${Math.round(updated.zoom * 100)}%`);
     },
 
+    setVideoEffect: (effect, value) => {
+      const currentT = get().playbackState.transform;
+      const updated = { ...currentT, [effect]: value };
+      get().adapter.setVideoTransform(updated);
+    },
+
     resetTransforms: () => {
       get().adapter.setVideoTransform(DEFAULT_TRANSFORM);
       get().showOsd('Reset Video Transforms');
+    },
+
+    toggleEqualizer: () => {
+      const { equalizer } = get().playbackState;
+      get().adapter.setEqualizer({ ...equalizer, enabled: !equalizer.enabled });
+    },
+
+    setEqualizerPreamp: (value) => {
+      const { equalizer } = get().playbackState;
+      get().adapter.setEqualizer({ ...equalizer, preamp: value });
+    },
+
+    setEqualizerBand: (index, value) => {
+      const { equalizer } = get().playbackState;
+      const newBands = [...equalizer.bands];
+      newBands[index] = value;
+      get().adapter.setEqualizer({ ...equalizer, bands: newBands });
+    },
+
+    setLoopA: () => {
+      const { currentTime } = get().playbackState;
+      const { loopState } = get().playbackState;
+      get().adapter.setLoop({ ...loopState, a: currentTime });
+      get().showOsd('Loop A Set');
+    },
+
+    setLoopB: () => {
+      const { currentTime } = get().playbackState;
+      const { loopState } = get().playbackState;
+      if (loopState.a !== null && currentTime > loopState.a) {
+        get().adapter.setLoop({ ...loopState, b: currentTime });
+        get().showOsd('Loop B Set');
+      }
+    },
+
+    clearLoop: () => {
+      get().adapter.setLoop({ a: null, b: null });
+      get().showOsd('Loop Cleared');
+    },
+
+    frameStep: () => {
+      get().adapter.frameStep();
     },
 
     selectSubtitle: (trackId) => {

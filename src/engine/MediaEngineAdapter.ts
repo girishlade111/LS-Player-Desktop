@@ -1,4 +1,4 @@
-import type { AudioTrack, CodecMetadata, MediaItem, SubtitleTrack, VideoTransform } from '../types';
+import type { AudioTrack, CodecMetadata, EqualizerState, LoopState, MediaItem, SubtitleTrack, VideoTransform } from '../types';
 
 export interface PlaybackState {
   isPlaying: boolean;
@@ -12,6 +12,8 @@ export interface PlaybackState {
   activeSubtitleId?: string;
   activeAudioTrackId?: string;
   isEnded: boolean;
+  equalizer: EqualizerState;
+  loopState: LoopState;
 }
 
 export type PlaybackEventListener = (state: PlaybackState) => void;
@@ -42,6 +44,9 @@ export interface MediaEngineAdapter {
   setSubtitleDelay(seconds: number): void;
   setAudioDelay(seconds: number): void;
   takeScreenshot(): Promise<string | undefined>;
+  setEqualizer(eq: EqualizerState): void;
+  setLoop(loop: LoopState): void;
+  frameStep(): void;
 
   // State updates & Cleanup
   subscribe(listener: PlaybackEventListener): () => void;
