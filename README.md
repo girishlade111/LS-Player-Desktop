@@ -1,32 +1,93 @@
-# React + TypeScript + Vite
+# LS Player (Desktop)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A modern, sleek cross-platform media player built with **React 19 + Vite + Tailwind CSS 4**, packaged as a native desktop app with **Tauri 2**. LS Player offers a VLC-style experience with a polished, customizable UI — playlists, playback controls, subtitles, audio/video settings, and more.
 
-Currently, two official plugins are available:
+The same React frontend can also be built as a static web demo — a live demo is linked below.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Modern media playback UI** — clean player shell with custom window chrome (frameless, transparent, centered window)
+- **Playback controls** — play/pause, seek, volume, speed, fullscreen (via `components/player/`)
+- **Playlists & queue management** — drag-and-drop files/folders, persisted state via Zustand stores
+- **Settings & dialogs** — VLC-style settings dialogs, subtitle handling, preferences (`components/settings`, `components/vlc-dialogs`)
+- **Playback engine** — pluggable engine layer under `src/engine/` with hooks (`src/hooks/`)
+- **Dark, polished design** — Tailwind CSS 4, Radix UI primitives, Framer Motion animations, Lucide icons
+- **Native desktop packaging** — Tauri 2 config (`src-tauri/`): bundles to installers for Windows, macOS, Linux
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the Oxlint configuration
+| Layer    | Tech                                   |
+|----------|----------------------------------------|
+| Frontend | React 19, TypeScript, Vite 8           |
+| Styling  | Tailwind CSS 4, Radix UI, Framer Motion |
+| State    | Zustand                                |
+| Lint     | Oxlint                                 |
+| Desktop  | Tauri 2 (Rust, `src-tauri/`)           |
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Quick Start
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### Prerequisites
+
+- Node.js 20+ and npm
+- (For native builds) Rust toolchain + Tauri system dependencies — see the [Tauri prerequisites guide](https://v2.tauri.app/start/prerequisites/)
+
+### Run in the browser (web dev server)
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Build the web demo (static)
+
+```bash
+npm run build       # outputs to dist/
+npm run preview     # preview the static build
+```
+
+### Build the desktop app
+
+```bash
+npm install -g @tauri-apps/cli   # or npx tauri
+npx tauri build                  # native installer in src-tauri/target/release/bundle
+```
+
+## Project Structure
+
+```
+LS-Player-Desktop/
+├── src/                      # React frontend
+│   ├── components/
+│   │   ├── layout/           # AppShell, window chrome
+│   │   ├── player/           # Player controls, progress, volume
+│   │   ├── dialogs/          # Open file / URL dialogs
+│   │   ├── vlc-dialogs/      # VLC-style dialogs
+│   │   ├── settings/         # Preferences panels
+│   │   └── ui/               # Reusable UI primitives (Radix-based)
+│   ├── engine/               # Playback engine abstraction
+│   ├── stores/               # Zustand stores (playlist, player, settings)
+│   ├── hooks/                # React hooks
+│   ├── lib/ utils/ types/    # Helpers, types
+│   └── assets/ styles/       # Media assets, global CSS
+├── src-tauri/                # Tauri 2 native shell
+│   ├── tauri.conf.json       # Window config, bundle targets, icons
+│   ├── Cargo.toml            # Rust deps
+│   └── src/                  # Rust main
+├── public/                   # Static assets
+├── vite.config.ts            # Vite config (base set for GitHub Pages)
+└── package.json
+```
+
+## Deploy Notes
+
+- The web frontend builds to a static `dist/` via `npm run build` (pure client-side, no server required).
+- Deployed as a static site on **GitHub Pages** at `https://girishlade111.github.io/LS-Player-Desktop/` — the built output is committed on the default branch so Pages can serve it.
+- Native desktop installers require a local Tauri build (`npx tauri build`); CI/CD per-platform runners can produce the artifacts as GitHub Releases.
+
+## License
+
+Free for personal use. See repository for details.
+
+---
+
+**Built by Girish Lade** — [ladestack.in](https://ladestack.in)
